@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -21,7 +22,7 @@ namespace AuthenticationAuthorization
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthentication("Cookies").AddCookie();
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -57,11 +58,11 @@ namespace AuthenticationAuthorization
                         new Claim(ClaimTypes.Name, "User Name")
                     };
 
-                    var claimIdentity = new ClaimsIdentity(claims, "Cookies");
+                    var claimIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
                     var claimPrincipal = new ClaimsPrincipal(claimIdentity);
 
-                    await context.SignInAsync("Cookies", claimPrincipal);
+                    await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimPrincipal);
 
                     string content = "<h3>로그인 완료</h3>";
                     context.Response.Headers["Content-Type"] = "text/html; charset=utf-8"; // ko-KR
@@ -116,8 +117,7 @@ namespace AuthenticationAuthorization
                 #region Logout
                 endpoints.MapGet("/Logout", async context =>
                 {
-                    await context.SignOutAsync("Cookies");
-
+                    await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
                     string content = "<h3>로그아웃 완료</h3>";
                     context.Response.Headers["Content-Type"] = "text/html; charset=utf-8"; // ko-KR
                     await context.Response.WriteAsync(content);
